@@ -4,8 +4,8 @@ var request = require('request'),
 	path = require("path"),
 	fs = require('fs'),
 	mime = require('mime'),
-	packpath = require('packpath'),
-	GitHubApi = require("github");
+	GitHubApi = require("github"),
+	cwd = process.cwd();
 
 function NodePreGypGithub() {}
 
@@ -14,7 +14,7 @@ NodePreGypGithub.prototype.owner;
 NodePreGypGithub.prototype.repo;
 NodePreGypGithub.prototype.package_json = {};
 NodePreGypGithub.prototype.release = {};
-NodePreGypGithub.prototype.stage_dir = path.join(packpath.parent(),"build","stage");
+NodePreGypGithub.prototype.stage_dir = path.join(cwd,"build","stage");
 
 NodePreGypGithub.prototype.init = function() {
 	var ownerRepo,
@@ -22,7 +22,7 @@ NodePreGypGithub.prototype.init = function() {
 		process.exit(1);
 	};
 	
-	this.package_json = JSON.parse(fs.readFileSync(path.join(packpath.parent(),'package.json')));
+	this.package_json = JSON.parse(fs.readFileSync(path.join(cwd,'package.json')));
 	
 	if(!this.package_json.repository || !this.package_json.repository.url){
 		console.error('Error: Missing repository.url in package.json');
@@ -88,6 +88,7 @@ NodePreGypGithub.prototype.uploadAssets = function(){
 	var asset;
 	console.log("Stage directory path: " + path.join(this.stage_dir));
 	fs.readdir(path.join(this.stage_dir), function(err, files){
+		if(typeof files === 'undefined') {console.log('no files found'); return;}
 		files.forEach(function(file){
 			asset = this.release.assets.filter(function(element, index, array){
 				return element.name === file;

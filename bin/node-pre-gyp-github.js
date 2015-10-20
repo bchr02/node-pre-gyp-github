@@ -6,16 +6,8 @@ var program = require('commander');
 program
 	.command('publish')
 	.description('publish the contents of .\\bin\\stage to the current version\'s GitHub release')
-	.action(function(env) {
-		var a = new x;
-		a.publish();
-	});
-	
-program
-	.command('publish')
-	.description('publish the contents of .\\bin\\stage to the current version\'s GitHub release')
 	.action(function() {
-		var x = new module;
+		var x = new module();
 		x.publish();
 	});
 
@@ -29,5 +21,3 @@ program
 	});
 
 program.parse(process.argv);
-
- program.parse(process.argv);
