@@ -4,11 +4,14 @@ var module = require('../index.js');
 var program = require('commander');
 
 program
-  .command('publish')
+  .command('publish [options]')
   .description('publish the contents of .\\bin\\stage to the current version\'s GitHub release')
-  .action(function() {
+  .option("-r, --release", "publish immediately, do not create draft")
+  .action(function(cmd, options){
+    var opts = {};
+    opts.draft = options.release ? false : true;
     var x = new module();
-    x.publish();
+    x.publish(opts);
   });
 
 program
