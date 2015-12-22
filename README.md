@@ -15,7 +15,7 @@ npm install -g node-pre-gyp-github
 ```
 
 ## Configuration
-This module is intented to be used with node-pre-gyp. Therefore, be sure to configure and install node-pre-gyp first. After having done that, within **```package.json```** update the ```binary``` property ```host``` so it matches the following format:
+This module is intended to be used with node-pre-gyp. Therefore, be sure to configure and install node-pre-gyp first. After having done that, within **```package.json```** update the ```binary``` property ```host``` so it matches the following format:
 
 ```
 https://github.com/{owner}/{repo}/releases/download/{1.0.1}
