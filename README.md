@@ -1,8 +1,13 @@
 # node-pre-gyp-github
-##### A node-pre-gyp module which provides the ability to publish to GitHub releases instead of Amazon S3 or some other cloud host.
+##### A node-pre-gyp module which provides the ability to publish to GitHub releases.
 
-##Usage
+## Usage
 Instead of ```node-pre-gyp publish``` use **```node-pre-gyp-github publish```**
+
+## Options
+* --release : Publish the GitHub Release immediately instead of creating a Draft.
+
+ex. ```node-pre-gyp-github publish --release```
 
 ## Install
 ```javascript
@@ -34,8 +39,14 @@ Within GitHub, create a new authorization:
 SET NODE_PRE_GYP_GITHUB_TOKEN=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 
-## Example
+## Example (Publish to GitHub as a Draft Release)
 1. node-pre-gyp configure
 2. node-pre-gyp build
 3. node-pre-gyp package
 4. node-pre-gyp-github publish
+
+## Example (Publish to GitHub as a Release)
+1. node-pre-gyp configure
+2. node-pre-gyp build
+3. node-pre-gyp package
+4. node-pre-gyp-github publish --release

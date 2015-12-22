@@ -56,10 +56,9 @@ NodePreGypGithub.prototype.authenticate_settings = function(){
 	};
 };
 
-NodePreGypGithub.prototype.createRelease = function(callback) {
-	this.github.authenticate(this.authenticate_settings());
-	this.github.releases.createRelease({
-		'owner': this.owner,
+NodePreGypGithub.prototype.createRelease = function(args, callback) {
+	var options = {
+		'owner': options.owner || this.owner,
 		'repo': this.repo,
 		'tag_name': this.package_json.version,
 		'target_commitish': 'master',
@@ -67,7 +66,14 @@ NodePreGypGithub.prototype.createRelease = function(callback) {
 		'body': this.package_json.name + ' ' + this.package_json.version,
 		'draft': true,
 		'prerelease': false
-	}, callback);
+	};
+	
+	Object.keys(args).forEach(function(key) {
+		options[key] = args[key] || options[key];
+	});
+	
+	this.github.authenticate(this.authenticate_settings());
+	this.github.releases.createRelease(options, callback);
 };
 
 NodePreGypGithub.prototype.uploadAsset = function(cfg){
@@ -107,7 +113,7 @@ NodePreGypGithub.prototype.uploadAssets = function(){
 	}.bind(this));
 };
 
-NodePreGypGithub.prototype.publish = function() {
+NodePreGypGithub.prototype.publish = function(options) {
 	this.init();
 	this.github.authenticate(this.authenticate_settings());
 	this.github.releases.listReleases({
@@ -128,7 +134,7 @@ NodePreGypGithub.prototype.publish = function() {
 		this.release = release[0];
 		
 		if(!release.length) {
-			this.createRelease(function(err, release) {
+			this.createRelease(options, function(err, release) {
 				this.release = release;
 				console.log('Release ' + this.package_json.version + " not found, so a draft release was created. YOU MUST MANUALLY PUBLISH THIS DRAFT WITHIN GITHUB FOR IT TO BE ACCESSIBLE.");
 				this.uploadAssets();
