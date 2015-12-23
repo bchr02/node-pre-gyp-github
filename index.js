@@ -58,7 +58,7 @@ NodePreGypGithub.prototype.authenticate_settings = function(){
 
 NodePreGypGithub.prototype.createRelease = function(args, callback) {
 	var options = {
-		'owner': options.owner || this.owner,
+		'owner': this.owner,
 		'repo': this.repo,
 		'tag_name': this.package_json.version,
 		'target_commitish': 'master',
