@@ -69,9 +69,11 @@ NodePreGypGithub.prototype.createRelease = function(args, callback) {
 	};
 	
 	Object.keys(args).forEach(function(key) {
-		options[key] = args[key] || options[key];
+		if(args.hasOwnProperty(key)) {
+			options[key] = args[key];
+		}
 	});
-	
+		
 	this.github.authenticate(this.authenticate_settings());
 	this.github.releases.createRelease(options, callback);
 };
