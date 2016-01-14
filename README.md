@@ -1,6 +1,8 @@
 # node-pre-gyp-github
 ##### A node-pre-gyp module which provides the ability to publish to GitHub releases.
 
+[![Join the chat at https://gitter.im/bchr02/node-pre-gyp-github](https://badges.gitter.im/bchr02/node-pre-gyp-github.svg)](https://gitter.im/bchr02/node-pre-gyp-github?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ## Usage
 Instead of ```node-pre-gyp publish``` use **```node-pre-gyp-github publish```**
 
