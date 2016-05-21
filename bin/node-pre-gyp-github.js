@@ -2,12 +2,11 @@
 
 var module = require('../index.js');
 var program = require('commander');
-
 program
 	.command('publish [options]')
 	.description('publish the contents of .\\bin\\stage to the current version\'s GitHub release')
 	.option("-r, --release", "publish immediately, do not create draft")
-	.option("-t, --tag", "release tag name")
+	.option("-t, --tag <name>", "release tag name")
 	.action(function(cmd, options){
 		var opts = {},
 			x = new module();
