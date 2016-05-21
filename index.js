@@ -108,7 +108,7 @@ NodePreGypGithub.prototype.uploadAssets = function(){
 				console.log("Staged file " + file + " found. Proceeding to upload it.");
 				this.uploadAsset({
 					fileName: file,
-					filePath: path.join(this.stage_dir, file)
+					filePath: path.join(stage_dir, file)
 				});
 			}
 		}.bind(this));
