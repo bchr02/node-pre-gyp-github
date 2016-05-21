@@ -34,7 +34,7 @@ Within GitHub, create a new authorization:
 1. go to Settings 
 2. click Personal access tokens
 3. click Generate new token
-4. Select all checkboxes (in a future update I will specify which precise checkboxes are needed, but for now...)
+4. Select "public_repo" and "repo_deployment"
 5. Generate Token
 6. copy the key that's generated and set NODE_PRE_GYP_GITHUB_TOKEN environment variable to it. Within your command prompt:
 
