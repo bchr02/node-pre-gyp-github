@@ -92,12 +92,39 @@ NodePreGypGithub.prototype.uploadAsset = function(cfg){
 	}.bind(this));
 };
 
-NodePreGypGithub.prototype.uploadAssets = function(){
-	var asset, stage_dir = path.join(this.stage_dir, this.release.tag_name);
-	console.log("Stage directory path: " + stage_dir);
-	fs.readdir(stage_dir, function(err, files){
-		if(typeof files === 'undefined') {console.log('no files found'); return;}
-		files.forEach(function(file){
+function asyncFlatMap(list, iterator, callback) {
+	var result = [], left = list.length;
+	if (!left) return callback(result);
+	list.forEach(function(item) {
+		iterator(item, function(item) {
+			if (item != null) result = result.concat(item);
+			if (!--left) callback(result);
+		});
+	});
+}
+
+function findFilesDeep(dir, callback) {
+	fs.readdir(dir, function(err, names) {
+		asyncFlatMap(names || [], function(name, next) {
+			var file = path.join(dir, name);
+			fs.stat(file, function(err, stat) {
+				if (stat) {
+					if (stat.isFile()) { return next(file); }
+					else if (stat.isDirectory()) { return findFilesDeep(file, next); }
+				}
+				next();
+			});
+		}, callback);
+	});
+};
+
+NodePreGypGithub.prototype.uploadAssets = function() {
+	console.log("Stage directory path: " + this.stage_dir);
+	findFilesDeep(this.stage_dir, function(paths) {
+		var asset;
+		if (!paths.length) { console.log('no files found'); return; }
+		paths.forEach(function(file_path) {
+			var file = path.basename(file_path);
 			asset = this.release.assets.filter(function(element, index, array){
 				return element.name === file;
 			});
@@ -108,7 +135,7 @@ NodePreGypGithub.prototype.uploadAssets = function(){
 				console.log("Staged file " + file + " found. Proceeding to upload it.");
 				this.uploadAsset({
 					fileName: file,
-					filePath: path.join(stage_dir, file)
+					filePath: file_path
 				});
 			}
 		}.bind(this));
