@@ -17,16 +17,17 @@ npm install -g node-pre-gyp-github
 ```
 
 ## Configuration
-This module is intended to be used with node-pre-gyp. Therefore, be sure to configure and install node-pre-gyp first. After having done that, within **```package.json```** update the ```binary``` property ```host``` so it matches the following format:
+This module is intended to be used with node-pre-gyp. Therefore, be sure to configure and install node-pre-gyp first. After having done that, within **```package.json```** update the ```binary``` properties ```host``` and ```remote_path``` so it matches the following format:
 
 ```
-https://github.com/{owner}/{repo}/releases/download/{1.0.1}
+  "host": "https://github.com/[owner]/[repo]/releases/download/",
+  "remote_path": "{version}"
 ```
-Be sure to replace ```{owner}```, ```{repo}```, ```{1.0.1}``` with actual values.
 
-***WARNING: Variable substitutions are not supported on the ```host``` property so you will have to manually update the version number with every change.*** Failure to do so will result in users installing the wrong binary versions.
+Be sure to replace ```[owner]```, ```[repo]```, with actual values,
+but DO NOT replace ```{version}``` with actual version.
 
-**Tip:** Since the version number will be included within the ```host``` you can ommit it from the package name.
+***WARNING: Variable substitutions are not supported on the ```host``` property but are supported in ```remote_path```, but the value of ```remote_path``` after substitutions must match the release tag name.*** Otherwise it will result in users installing the wrong binary versions.
 
 Within GitHub, create a new authorization:
 
