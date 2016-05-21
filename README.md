@@ -53,3 +53,21 @@ SET NODE_PRE_GYP_GITHUB_TOKEN=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 2. node-pre-gyp build
 3. node-pre-gyp package
 4. node-pre-gyp-github publish --release
+
+## Advanced - release tag name
+
+```node-pre-gyp-github``` will match the current release tag with the contents of the ```version``` property found in ```package.json```. Using --tag option you may supply your own tag name, but make sure the ```remote_path``` property matches the tag name exactly (after substitutions). Otherwise ```node-pre-gyp-github`` will not be able to upload packed binary.
+
+Let's say the new version of your package is 1.2.3 and you want release tag to match the default ```npm version``` format (with "v" prefix):
+
+Change ```remote_path``` to:
+
+```
+  "remote_path": "v{version}"
+```
+
+and publish with:
+
+```
+node-pre-gyp-github publish --release --tag v1.2.3
+```
