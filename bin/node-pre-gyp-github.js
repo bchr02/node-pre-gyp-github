@@ -7,9 +7,11 @@ program
 	.command('publish [options]')
 	.description('publish the contents of .\\bin\\stage to the current version\'s GitHub release')
 	.option("-r, --release", "publish immediately, do not create draft")
+	.option("-t, --tag", "release tag name")
 	.action(function(cmd, options){
 		var opts = {},
 			x = new module();
+		if (options.tag) opts.tag_name = options.tag;
 		opts.draft = options.release ? false : true;
 		x.publish(opts);
 	});

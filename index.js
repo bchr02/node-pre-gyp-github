@@ -88,7 +88,7 @@ NodePreGypGithub.prototype.uploadAsset = function(cfg){
 		filePath: cfg.filePath
 	}, function(err){
 		if(err) {console.error(err); return;}
-		console.log('Staged file ' + cfg.fileName + ' saved to ' + this.owner + '/' +  this.repo + ' release ' + this.package_json.version + ' successfully.');
+		console.log('Staged file ' + cfg.fileName + ' saved to ' + this.owner + '/' +  this.repo + ' release ' + this.release.tag_name + ' successfully.');
 	}.bind(this));
 };
 
@@ -102,7 +102,7 @@ NodePreGypGithub.prototype.uploadAssets = function(){
 				return element.name === file;
 			});
 			if(asset.length) {
-				console.log("Staged file " + file + " found but it already exists in release " + this.package_json.version + ". If you would like to replace it, you must first manually delete it within GitHub.");
+				console.log("Staged file " + file + " found but it already exists in release " + this.release.tag_name + ". If you would like to replace it, you must first manually delete it within GitHub.");
 			}
 			else {
 				console.log("Staged file " + file + " found. Proceeding to upload it.");
@@ -127,8 +127,9 @@ NodePreGypGithub.prototype.publish = function(options) {
 		if(err) {console.error(err); return;}
 		
 		release	= (function(){ // create a new array containing only those who have a matching version.
+			var tag_name = options.tag_name || this.package_json.version;
 			data = data.filter(function(element, index, array){
-				return element.tag_name === this.package_json.version;
+				return element.tag_name === tag_name;
 			}.bind(this));
 			return data;
 		}.bind(this))();
@@ -138,7 +139,7 @@ NodePreGypGithub.prototype.publish = function(options) {
 		if(!release.length) {
 			this.createRelease(options, function(err, release) {
 				this.release = release;
-				console.log('Release ' + this.package_json.version + " not found, so a draft release was created. YOU MUST MANUALLY PUBLISH THIS DRAFT WITHIN GITHUB FOR IT TO BE ACCESSIBLE.");
+				console.log('Release ' + release.tag_name + " not found, so a draft release was created. YOU MUST MANUALLY PUBLISH THIS DRAFT WITHIN GITHUB FOR IT TO BE ACCESSIBLE.");
 				this.uploadAssets();
 			}.bind(this));
 		}
