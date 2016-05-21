@@ -93,9 +93,9 @@ NodePreGypGithub.prototype.uploadAsset = function(cfg){
 };
 
 NodePreGypGithub.prototype.uploadAssets = function(){
-	var asset;
-	console.log("Stage directory path: " + path.join(this.stage_dir));
-	fs.readdir(path.join(this.stage_dir), function(err, files){
+	var asset, stage_dir = path.join(this.stage_dir, this.release.tag_name);
+	console.log("Stage directory path: " + stage_dir);
+	fs.readdir(stage_dir, function(err, files){
 		if(typeof files === 'undefined') {console.log('no files found'); return;}
 		files.forEach(function(file){
 			asset = this.release.assets.filter(function(element, index, array){
