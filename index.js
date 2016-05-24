@@ -126,9 +126,17 @@ NodePreGypGithub.prototype.publish = function(options) {
 		
 		if(err) {console.error(err); return;}
 		
+		// when remote_path is set expect files to be in stage_dir / remote_path after substitution
+		if (this.package_json.binary.remote_path) {
+			options.tag_name = this.package_json.binary.remote_path.replace(/{version}/g, this.package_json.version);
+			this.stage_dir = path.join(this.stage_dir, options.tag_name);
+		} else {
+			options.tag_name = this.package_json.version;
+		}
+		
 		release	= (function(){ // create a new array containing only those who have a matching version.
 			data = data.filter(function(element, index, array){
-				return element.tag_name === this.package_json.version;
+				return element.tag_name === options.tag_name;
 			}.bind(this));
 			return data;
 		}.bind(this))();
