@@ -27,7 +27,7 @@ This module is intended to be used with node-pre-gyp. Therefore, be sure to conf
 Be sure to replace ```[owner]```, ```[repo]```, with actual values,
 but DO NOT replace ```{version}``` with actual version.
 
-***WARNING: Variable substitutions are not supported on the ```host``` property and in the ```remote_path``` only `{version}` placeholder is supported. The value of ```remote_path``` will become a release tag name.***
+***WARNING: Variable substitutions are not supported on the ```host``` property and on the ```remote_path``` only ```{version}``` placeholder is supported. The value of ```remote_path``` after substitution will become a release tag name. Do not use [forbidden git tag characters](https://git-scm.com/docs/git-check-ref-format) for ```version``` and ```remote_path``` properties.***
 
 Within GitHub, create a new authorization:
 
