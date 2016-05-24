@@ -163,6 +163,8 @@ NodePreGypGithub.prototype.publish = function(options) {
 		
 		if(!release.length) {
 			this.createRelease(options, function(err, release) {
+				if(err) {console.error(err); return;}
+
 				this.release = release;
 				console.log('Release ' + this.package_json.version + " not found, so a draft release was created. YOU MUST MANUALLY PUBLISH THIS DRAFT WITHIN GITHUB FOR IT TO BE ACCESSIBLE.");
 				this.uploadAssets();
