@@ -149,7 +149,7 @@ NodePreGypGithub.prototype.publish = function(options) {
 			options.tag_name = this.package_json.binary.remote_path.replace(/{version}/g, this.package_json.version);
 			this.stage_dir = path.join(this.stage_dir, options.tag_name);
 		} else {
-			// This is here for backwards compatibility for before binary.remote_path support was added in version 1.1.3.
+			// This is here for backwards compatibility for before binary.remote_path support was added in version 1.2.0.
 			options.tag_name = this.package_json.version;
 		}
 		
