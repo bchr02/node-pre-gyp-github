@@ -166,7 +166,11 @@ NodePreGypGithub.prototype.publish = function(options) {
 				if(err) {console.error(err); return;}
 
 				this.release = release;
-				console.log('Release ' + this.package_json.version + " not found, so a draft release was created. YOU MUST MANUALLY PUBLISH THIS DRAFT WITHIN GITHUB FOR IT TO BE ACCESSIBLE.");
+				if (release.draft) {
+					console.log('Release ' + release.tag_name + " not found, so a draft release was created. YOU MUST MANUALLY PUBLISH THIS DRAFT WITHIN GITHUB FOR IT TO BE ACCESSIBLE.");
+				} else {
+					console.log('Release ' + release.tag_name + " not found, so a new release was created and published.");
+				}
 				this.uploadAssets();
 			}.bind(this));
 		}
