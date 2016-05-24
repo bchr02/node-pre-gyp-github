@@ -17,23 +17,41 @@ NodePreGypGithub.prototype.release = {};
 NodePreGypGithub.prototype.stage_dir = path.join(cwd,"build","stage");
 
 NodePreGypGithub.prototype.init = function() {
-	var ownerRepo,
+	var ownerRepo, hostPrefix,
 		error = function(){
 		process.exit(1);
 	};
 	
 	this.package_json = JSON.parse(fs.readFileSync(path.join(cwd,'package.json')));
-	
+
 	if(!this.package_json.repository || !this.package_json.repository.url){
 		console.error('Error: Missing repository.url in package.json');
 		error();
 	}
 	else {
-		ownerRepo = this.package_json.repository.url.match(/github\.com\/(.*)(?=\.git)/i)[1].split('/'),
-		this.owner = ownerRepo[0],
-		this.repo = ownerRepo[1];
+		ownerRepo = this.package_json.repository.url.match(/github\.com\/(.*)(?=\.git)/i);
+		if (ownerRepo) {
+			ownerRepo = ownerRepo[1].split('/');
+			this.owner = ownerRepo[0];
+			this.repo = ownerRepo[1];
+		}
+		else {
+			console.error('Error: Not a GitHub repository.url in package.json');
+			error();
+		}
 	}
-	
+
+	hostPrefix = 'https://github.com/' + this.owner + '/' + this.repo + '/releases/download/';
+	if(!this.package_json.binary || 'object' !== typeof this.package_json.binary ||
+			'string' !== typeof this.package_json.binary.host){
+		console.error('Error: Missing binary.host in package.json, configure node-pre-gyp first');
+		error();
+	}
+	else if (this.package_json.binary.host.substr(0, hostPrefix.length) !== hostPrefix){
+		console.error('Error: binary.host in package.json should begin with: "' + hostPrefix + '"');
+		error();		
+	}
+
 	this.github = new GitHubApi({ // set defaults
 		// required
 		version: "3.0.0",
