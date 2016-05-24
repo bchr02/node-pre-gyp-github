@@ -88,7 +88,7 @@ NodePreGypGithub.prototype.uploadAsset = function(cfg){
 		filePath: cfg.filePath
 	}, function(err){
 		if(err) {console.error(err); return;}
-		console.log('Staged file ' + cfg.fileName + ' saved to ' + this.owner + '/' +  this.repo + ' release ' + this.package_json.version + ' successfully.');
+		console.log('Staged file ' + cfg.fileName + ' saved to ' + this.owner + '/' +  this.repo + ' release ' + this.release.tag_name + ' successfully.');
 	}.bind(this));
 };
 
@@ -102,7 +102,7 @@ NodePreGypGithub.prototype.uploadAssets = function(){
 				return element.name === file;
 			});
 			if(asset.length) {
-				console.log("Staged file " + file + " found but it already exists in release " + this.package_json.version + ". If you would like to replace it, you must first manually delete it within GitHub.");
+				console.log("Staged file " + file + " found but it already exists in release " + this.release.tag_name + ". If you would like to replace it, you must first manually delete it within GitHub.");
 			}
 			else {
 				console.log("Staged file " + file + " found. Proceeding to upload it.");
