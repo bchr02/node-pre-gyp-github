@@ -17,41 +17,31 @@ NodePreGypGithub.prototype.release = {};
 NodePreGypGithub.prototype.stage_dir = path.join(cwd,"build","stage");
 
 NodePreGypGithub.prototype.init = function() {
-	var ownerRepo, hostPrefix,
-		error = function(){
-		process.exit(1);
-	};
+	var ownerRepo, hostPrefix;
 	
 	this.package_json = JSON.parse(fs.readFileSync(path.join(cwd,'package.json')));
-
+	
 	if(!this.package_json.repository || !this.package_json.repository.url){
-		console.error('Error: Missing repository.url in package.json');
-		error();
+		throw new Error('Missing repository.url in package.json');
 	}
 	else {
 		ownerRepo = this.package_json.repository.url.match(/github\.com\/(.*)(?=\.git)/i);
-		if (ownerRepo) {
+		if(ownerRepo) {
 			ownerRepo = ownerRepo[1].split('/');
 			this.owner = ownerRepo[0];
 			this.repo = ownerRepo[1];
 		}
-		else {
-			console.error('Error: Not a GitHub repository.url in package.json');
-			error();
-		}
+		else throw new Error('A correctly formatted GitHub repository.url was not found within package.json');
 	}
-
+	
 	hostPrefix = 'https://github.com/' + this.owner + '/' + this.repo + '/releases/download/';
-	if(!this.package_json.binary || 'object' !== typeof this.package_json.binary ||
-			'string' !== typeof this.package_json.binary.host){
-		console.error('Error: Missing binary.host in package.json, configure node-pre-gyp first');
-		error();
+	if(!this.package_json.binary || 'object' !== typeof this.package_json.binary || 'string' !== typeof this.package_json.binary.host){
+		throw new Error('Missing binary.host in package.json');
 	}
 	else if (this.package_json.binary.host.substr(0, hostPrefix.length) !== hostPrefix){
-		console.error('Error: binary.host in package.json should begin with: "' + hostPrefix + '"');
-		error();		
+		throw new Error('binary.host in package.json should begin with: "' + hostPrefix + '"');
 	}
-
+	
 	this.github = new GitHubApi({ // set defaults
 		// required
 		version: "3.0.0",
@@ -68,9 +58,11 @@ NodePreGypGithub.prototype.init = function() {
 };
 
 NodePreGypGithub.prototype.authenticate_settings = function(){
+	var token = process.env.NODE_PRE_GYP_GITHUB_TOKEN;
+	if(!token) throw new Error('NODE_PRE_GYP_GITHUB_TOKEN environment variable not found');
 	return {
-		type: "oauth",
-		token: process.env.NODE_PRE_GYP_GITHUB_TOKEN
+		"type": "oauth",
+		"token": token
 	};
 };
 
@@ -105,7 +97,7 @@ NodePreGypGithub.prototype.uploadAsset = function(cfg){
 		name: cfg.fileName,
 		filePath: cfg.filePath
 	}, function(err){
-		if(err) {console.error(err); return;}
+		if(err) throw err;
 		console.log('Staged file ' + cfg.fileName + ' saved to ' + this.owner + '/' +  this.repo + ' release ' + this.release.tag_name + ' successfully.');
 	}.bind(this));
 };
@@ -114,13 +106,16 @@ NodePreGypGithub.prototype.uploadAssets = function(){
 	var asset;
 	console.log("Stage directory path: " + path.join(this.stage_dir));
 	fs.readdir(path.join(this.stage_dir), function(err, files){
-		if(typeof files === 'undefined') {console.log('no files found'); return;}
+		if(err) throw err;
+		
+		if(!files.length) throw new Error('No files found within the stage directory: ' + this.stage_dir);
+		
 		files.forEach(function(file){
 			asset = this.release.assets.filter(function(element, index, array){
 				return element.name === file;
 			});
 			if(asset.length) {
-				console.log("Staged file " + file + " found but it already exists in release " + this.release.tag_name + ". If you would like to replace it, you must first manually delete it within GitHub.");
+				throw new Error("Staged file " + file + " found but it already exists in release " + this.release.tag_name + ". If you would like to replace it, you must first manually delete it within GitHub.");
 			}
 			else {
 				console.log("Staged file " + file + " found. Proceeding to upload it.");
@@ -142,7 +137,7 @@ NodePreGypGithub.prototype.publish = function(options) {
 	}, function(err, data){
 		var release;
 		
-		if(err) {console.error(err); return;}
+		if(err) throw err;
 		
 		// when remote_path is set expect files to be in stage_dir / remote_path after substitution
 		if (this.package_json.binary.remote_path) {
@@ -164,12 +159,13 @@ NodePreGypGithub.prototype.publish = function(options) {
 		
 		if(!release.length) {
 			this.createRelease(options, function(err, release) {
-				if(err) {console.error(err); return;}
-
+				if(err) throw err;
+				
 				this.release = release;
 				if (release.draft) {
 					console.log('Release ' + release.tag_name + " not found, so a draft release was created. YOU MUST MANUALLY PUBLISH THIS DRAFT WITHIN GITHUB FOR IT TO BE ACCESSIBLE.");
-				} else {
+				}
+				else {
 					console.log('Release ' + release.tag_name + " not found, so a new release was created and published.");
 				}
 				this.uploadAssets();
