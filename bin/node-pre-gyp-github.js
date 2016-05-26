@@ -5,7 +5,7 @@ var program = require('commander');
 
 program
 	.command('publish [options]')
-	.description('publish the contents of .\\bin\\stage to the current version\'s GitHub release')
+	.description('publishes the contents of .\\build\\stage\\{version} to the current version\'s GitHub release')
 	.option("-r, --release", "publish immediately, do not create draft")
 	.action(function(cmd, options){
 		var opts = {},
@@ -20,7 +20,7 @@ program
 		console.log();
 		console.log('Usage: node-pre-gyp-github publish');
 		console.log();
-		console.log('publish the contents of .\\bin\\stage to the current version\'s GitHub release');
+		console.log('publishes the contents of .\\build\\stage\\{version} to the current version\'s GitHub release');
 	});
 
 program.parse(process.argv);
