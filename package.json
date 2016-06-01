@@ -1,11 +1,12 @@
 {
   "name": "node-pre-gyp-github",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "A node-pre-gyp module which provides the ability to publish to GitHub releases.",
   "bin": "./bin/node-pre-gyp-github.js",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha test",
+	"coverage": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec"
   },
   "repository": {
     "type": "git",
@@ -25,9 +26,12 @@
   ],
   "dependencies": {
     "github": "^0.2.4",
-    "commander": "^2.9.0",
-    "mime": "^1.3.4",
-    "request": "^2.67.0"
+    "commander": "^2.9.0"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "istanbul": "^0.4.3",
+    "mocha": "^2.5.3"
   },
   "author": "Bill Christo",
   "license": "MIT",

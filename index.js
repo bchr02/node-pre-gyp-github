@@ -1,17 +1,26 @@
 "use strict";
 
-var request = require('request'),
-	path = require("path"),
-	fs = require('fs'),
-	mime = require('mime'),
-	GitHubApi = require("github"),
-	cwd = process.cwd();
+var path		= require("path");
+var fs			= require('fs');
+var GitHubApi	= require("github");
+var cwd			= process.cwd();
 
 function NodePreGypGithub() {}
 
-NodePreGypGithub.prototype.github;
-NodePreGypGithub.prototype.owner;
-NodePreGypGithub.prototype.repo;
+NodePreGypGithub.prototype.github = new GitHubApi({ // set defaults
+	// required
+	version: "3.0.0",
+	// optional
+	debug: false,
+	protocol: "https",
+	host: "api.github.com",
+	pathPrefix: "", // for some GHEs; none for GitHub
+	timeout: 5000,
+	headers: {}
+});
+
+NodePreGypGithub.prototype.owner = "";
+NodePreGypGithub.prototype.repo = "";
 NodePreGypGithub.prototype.package_json = {};
 NodePreGypGithub.prototype.release = {};
 NodePreGypGithub.prototype.stage_dir = path.join(cwd,"build","stage");
@@ -42,19 +51,8 @@ NodePreGypGithub.prototype.init = function() {
 		throw new Error('binary.host in package.json should begin with: "' + hostPrefix + '"');
 	}
 	
-	this.github = new GitHubApi({ // set defaults
-		// required
-		version: "3.0.0",
-		// optional
-		debug: false,
-		protocol: "https",
-		host: "api.github.com",
-		pathPrefix: "", // for some GHEs; none for GitHub
-		timeout: 5000,
-		headers: {
-			"user-agent": (this.package_json.name) ? this.package_json.name : "node-pre-gyp-github" // GitHub is happy with a unique user agent
-		}
-	});
+	this.github.headers = {"user-agent": (this.package_json.name) ? this.package_json.name : "node-pre-gyp-github"}; // GitHub is happy with a unique user agent
+	
 };
 
 NodePreGypGithub.prototype.authenticate_settings = function(){
@@ -141,7 +139,7 @@ NodePreGypGithub.prototype.publish = function(options) {
 		
 		// when remote_path is set expect files to be in stage_dir / remote_path after substitution
 		if (this.package_json.binary.remote_path) {
-			options.tag_name = this.package_json.binary.remote_path.replace(/{version}/g, this.package_json.version);
+			options.tag_name = this.package_json.binary.remote_path.replace(/\{version\}/g, this.package_json.version);
 			this.stage_dir = path.join(this.stage_dir, options.tag_name);
 		} else {
 			// This is here for backwards compatibility for before binary.remote_path support was added in version 1.2.0.
@@ -149,10 +147,13 @@ NodePreGypGithub.prototype.publish = function(options) {
 		}
 		
 		release	= (function(){ // create a new array containing only those who have a matching version.
-			data = data.filter(function(element, index, array){
-				return element.tag_name === options.tag_name;
-			}.bind(this));
-			return data;
+			if(data) {
+				data = data.filter(function(element, index, array){
+					return element.tag_name === options.tag_name;
+				}.bind(this));
+				return data;
+			}
+			else return [];
 		}.bind(this))();
 		
 		this.release = release[0];
