@@ -1,9 +1,14 @@
 "use strict";
 
-var path		= require("path");
-var fs			= require('fs');
-var GitHubApi	= require("github");
-var cwd			= process.cwd();
+var path = require("path");
+var fs = require('fs');
+var GitHubApi = require("github");
+var cwd = process.cwd();
+
+var verbose;
+var consoleLog = function(x){
+	return (verbose) ? consoleLog(x) : false;
+};
 
 function NodePreGypGithub() {}
 
@@ -77,11 +82,11 @@ NodePreGypGithub.prototype.createRelease = function(args, callback) {
 	};
 	
 	Object.keys(args).forEach(function(key) {
-		if(args.hasOwnProperty(key)) {
+		if(args.hasOwnProperty(key) && options.hasOwnProperty(key)) {
 			options[key] = args[key];
 		}
 	});
-		
+	
 	this.github.authenticate(this.authenticate_settings());
 	this.github.releases.createRelease(options, callback);
 };
@@ -96,13 +101,13 @@ NodePreGypGithub.prototype.uploadAsset = function(cfg){
 		filePath: cfg.filePath
 	}, function(err){
 		if(err) throw err;
-		console.log('Staged file ' + cfg.fileName + ' saved to ' + this.owner + '/' +  this.repo + ' release ' + this.release.tag_name + ' successfully.');
+		consoleLog('Staged file ' + cfg.fileName + ' saved to ' + this.owner + '/' +  this.repo + ' release ' + this.release.tag_name + ' successfully.');
 	}.bind(this));
 };
 
 NodePreGypGithub.prototype.uploadAssets = function(){
 	var asset;
-	console.log("Stage directory path: " + path.join(this.stage_dir));
+	consoleLog("Stage directory path: " + path.join(this.stage_dir));
 	fs.readdir(path.join(this.stage_dir), function(err, files){
 		if(err) throw err;
 		
@@ -116,7 +121,7 @@ NodePreGypGithub.prototype.uploadAssets = function(){
 				throw new Error("Staged file " + file + " found but it already exists in release " + this.release.tag_name + ". If you would like to replace it, you must first manually delete it within GitHub.");
 			}
 			else {
-				console.log("Staged file " + file + " found. Proceeding to upload it.");
+				consoleLog("Staged file " + file + " found. Proceeding to upload it.");
 				this.uploadAsset({
 					fileName: file,
 					filePath: path.join(this.stage_dir, file)
@@ -127,6 +132,8 @@ NodePreGypGithub.prototype.uploadAssets = function(){
 };
 
 NodePreGypGithub.prototype.publish = function(options) {
+	options = (typeof options === 'undefined') ? {} : options;
+	verbose = (typeof options.verbose === 'undefined' || options.verbose) ? true : false;
 	this.init();
 	this.github.authenticate(this.authenticate_settings());
 	this.github.releases.listReleases({
@@ -164,10 +171,10 @@ NodePreGypGithub.prototype.publish = function(options) {
 				
 				this.release = release;
 				if (release.draft) {
-					console.log('Release ' + release.tag_name + " not found, so a draft release was created. YOU MUST MANUALLY PUBLISH THIS DRAFT WITHIN GITHUB FOR IT TO BE ACCESSIBLE.");
+					consoleLog('Release ' + release.tag_name + " not found, so a draft release was created. YOU MUST MANUALLY PUBLISH THIS DRAFT WITHIN GITHUB FOR IT TO BE ACCESSIBLE.");
 				}
 				else {
-					console.log('Release ' + release.tag_name + " not found, so a new release was created and published.");
+					consoleLog('Release ' + release.tag_name + " not found, so a new release was created and published.");
 				}
 				this.uploadAssets();
 			}.bind(this));

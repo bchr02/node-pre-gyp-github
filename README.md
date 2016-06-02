@@ -1,15 +1,17 @@
 # node-pre-gyp-github
 ##### A node-pre-gyp module which provides the ability to publish to GitHub releases.
 
+[![Coverage Status](https://coveralls.io/repos/github/bchr02/node-pre-gyp-github/badge.svg?branch=master)](https://coveralls.io/github/bchr02/node-pre-gyp-github?branch=master)
 [![Join the chat at https://gitter.im/bchr02/node-pre-gyp-github](https://badges.gitter.im/bchr02/node-pre-gyp-github.svg)](https://gitter.im/bchr02/node-pre-gyp-github?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Usage
 Instead of ```node-pre-gyp publish``` use **```node-pre-gyp-github publish```**
 
-## Options
+## Options for publish command
+* --silent : Turns verbose messages off.
 * --release : Publish the GitHub Release immediately instead of creating a Draft.
 
-ex. ```node-pre-gyp-github publish --release```
+  For Ex. ```node-pre-gyp-github publish --release```
 
 ## Install
 ```javascript
