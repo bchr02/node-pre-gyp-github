@@ -7,10 +7,12 @@ program
 	.command('publish [options]')
 	.description('publishes the contents of .\\build\\stage\\{version} to the current version\'s GitHub release')
 	.option("-r, --release", "publish immediately, do not create draft")
+	.option("-s, --silent", "turns verbose messages off")
 	.action(function(cmd, options){
 		var opts = {},
 			x = new module();
 		opts.draft = options.release ? false : true;
+		opts.verbose = options.silent ? false : true;
 		x.publish(opts);
 	});
 
