@@ -7,7 +7,7 @@ var cwd = process.cwd();
 
 var verbose;
 var consoleLog = function(x){
-	return (verbose) ? consoleLog(x) : false;
+	return (verbose) ? console.log(x) : false;
 };
 
 function NodePreGypGithub() {}
