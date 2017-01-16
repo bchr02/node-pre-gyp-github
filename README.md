@@ -19,17 +19,18 @@ npm install -g node-pre-gyp-github
 ```
 
 ## Configuration
-This module is intended to be used with node-pre-gyp. Therefore, be sure to configure and install node-pre-gyp first. After having done that, within **```package.json```** update the ```binary``` properties ```host``` and ```remote_path``` so it matches the following format:
+This module is intended to be used with node-pre-gyp. Therefore, be sure to configure and install node-pre-gyp first. After having done that, within **```package.json```** update the `binary` section properties so they match the following format:
 
 ```
-  "host": "https://github.com/[owner]/[repo]/releases/download/",
-  "remote_path": "{version}"
+  "host": "https://github.com",
+  "remote_path": "/[owner]/[repo]/releases/download/",
+  "tag": "{version}"
 ```
 
-Be sure to replace ```[owner]```, ```[repo]```, with actual values,
-but DO NOT replace ```{version}``` with actual version.
+Be sure to replace `[owner]`, `[repo]`, with actual values,
+but DO NOT replace `{version}` with actual version.
 
-***WARNING: Variable substitutions are not supported on the ```host``` property and on the ```remote_path``` only ```{version}``` placeholder is supported. The value of ```remote_path``` after substitution will become a release tag name. Do not use [forbidden git tag characters](https://git-scm.com/docs/git-check-ref-format) for ```version``` and ```remote_path``` properties.***
+***WARNING: Variable substitutions are not supported on the `host` or `remote_path` property.  Only `{version}` placeholder is supported for the `tag` property. The value of `tag` after substitution will become a release tag name. Do not use [forbidden git tag characters](https://git-scm.com/docs/git-check-ref-format) in your `package.version` or `package.binary.tag` properties.***
 
 Within GitHub, create a new authorization:
 
