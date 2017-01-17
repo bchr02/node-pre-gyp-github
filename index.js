@@ -31,10 +31,10 @@ NodePreGypGithub.prototype.release = {};
 NodePreGypGithub.prototype.stage_dir = path.join(cwd,"build","stage");
 
 NodePreGypGithub.prototype.init = function() {
-	var ownerRepo, hostPrefix;
-	
+	var ownerRepo, hostPrefix, pathPrefix;
+
 	this.package_json = JSON.parse(fs.readFileSync(path.join(cwd,'package.json')));
-	
+
 	if(!this.package_json.repository || !this.package_json.repository.url){
 		throw new Error('Missing repository.url in package.json');
 	}
@@ -47,17 +47,26 @@ NodePreGypGithub.prototype.init = function() {
 		}
 		else throw new Error('A correctly formatted GitHub repository.url was not found within package.json');
 	}
-	
-	hostPrefix = 'https://github.com/' + this.owner + '/' + this.repo + '/releases/download/';
+
+	hostPrefix = 'https://github.com'
+	pathPrefix = '/' + this.owner + '/' + this.repo + '/releases/download/';
 	if(!this.package_json.binary || 'object' !== typeof this.package_json.binary || 'string' !== typeof this.package_json.binary.host){
 		throw new Error('Missing binary.host in package.json');
 	}
 	else if (this.package_json.binary.host.substr(0, hostPrefix.length) !== hostPrefix){
 		throw new Error('binary.host in package.json should begin with: "' + hostPrefix + '"');
 	}
-	
+	else if('string' == typeof this.package_json.binary.tag ) {
+	  if (this.package_json.binary.remote_path.substr(0, pathPrefix.length) !== pathPrefix){
+			throw new Error('binary.remote_path in package.json should begin with: "' + pathPrefix + '" when using binary.tag');
+    }
+	}
+  else if(! this.package_json.binary.host.match(pathPrefix)) {
+		throw new Error('binary.host in package.json should contain: "' + pathPrefix + '"');
+  }
+
 	this.github.headers = {"user-agent": (this.package_json.name) ? this.package_json.name : "node-pre-gyp-github"}; // GitHub is happy with a unique user agent
-	
+
 };
 
 NodePreGypGithub.prototype.authenticate_settings = function(){
@@ -80,13 +89,13 @@ NodePreGypGithub.prototype.createRelease = function(args, callback) {
 		'draft': true,
 		'prerelease': false
 	};
-	
+
 	Object.keys(args).forEach(function(key) {
 		if(args.hasOwnProperty(key) && options.hasOwnProperty(key)) {
 			options[key] = args[key];
 		}
 	});
-	
+
 	this.github.authenticate(this.authenticate_settings());
 	this.github.releases.createRelease(options, callback);
 };
@@ -110,9 +119,9 @@ NodePreGypGithub.prototype.uploadAssets = function(){
 	consoleLog("Stage directory path: " + path.join(this.stage_dir));
 	fs.readdir(path.join(this.stage_dir), function(err, files){
 		if(err) throw err;
-		
+
 		if(!files.length) throw new Error('No files found within the stage directory: ' + this.stage_dir);
-		
+
 		files.forEach(function(file){
 			asset = this.release.assets.filter(function(element, index, array){
 				return element.name === file;
@@ -141,18 +150,25 @@ NodePreGypGithub.prototype.publish = function(options) {
 		'repo': this.repo
 	}, function(err, data){
 		var release;
-		
+
 		if(err) throw err;
-		
+
+		// prefer `binary.tag` if present, before remote_path - see https://github.com/bchr02/node-pre-gyp-github/issues/18
+		if (this.package_json.binary.tag) {
+			options.tag_name = this.package_json.binary.tag.replace(/\{version\}/g, this.package_json.version);
+			// stage_dir is still based on remote_path, not tag:
+			this.stage_dir = path.join(this.stage_dir, (this.package_json.binary.remote_path || ''));
+		}
 		// when remote_path is set expect files to be in stage_dir / remote_path after substitution
-		if (this.package_json.binary.remote_path) {
+		// {version} substitution only takes place in `remote_path` if `package_json.binary.tag` is not present:
+		else if (this.package_json.binary.remote_path) {
 			options.tag_name = this.package_json.binary.remote_path.replace(/\{version\}/g, this.package_json.version);
 			this.stage_dir = path.join(this.stage_dir, options.tag_name);
 		} else {
 			// This is here for backwards compatibility for before binary.remote_path support was added in version 1.2.0.
 			options.tag_name = this.package_json.version;
 		}
-		
+
 		release	= (function(){ // create a new array containing only those who have a matching version.
 			if(data) {
 				data = data.filter(function(element, index, array){
@@ -162,13 +178,13 @@ NodePreGypGithub.prototype.publish = function(options) {
 			}
 			else return [];
 		}.bind(this))();
-		
+
 		this.release = release[0];
-		
+
 		if(!release.length) {
 			this.createRelease(options, function(err, release) {
 				if(err) throw err;
-				
+
 				this.release = release;
 				if (release.draft) {
 					consoleLog('Release ' + release.tag_name + " not found, so a draft release was created. YOU MUST MANUALLY PUBLISH THIS DRAFT WITHIN GITHUB FOR IT TO BE ACCESSIBLE.");
