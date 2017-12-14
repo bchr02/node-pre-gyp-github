@@ -93,9 +93,10 @@ NodePreGypGithub.prototype.createRelease = function(args, callback) {
 
 NodePreGypGithub.prototype.uploadAsset = function(cfg){
 	this.github.authenticate(this.authenticate_settings());
+	var releaseID = this.release.id === undefined ? this.release.data.id : this.release.id;
 	this.github.repos.uploadAsset({
 		owner: this.owner,
-		id: this.release.id,
+		id: releaseID,
 		repo: this.repo,
 		name: cfg.fileName,
 		filePath: cfg.filePath
