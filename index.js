@@ -109,7 +109,7 @@ NodePreGypGithub.prototype.uploadAsset = function(cfg){
 NodePreGypGithub.prototype.uploadAssets = function(){
 	var asset;
 	consoleLog("Stage directory path: " + path.join(this.stage_dir));
-	fs.readdir(path.join('D:/HSM/OwnRepository/TestNodeGypGithub/build/stage/0.0.2'), function(err, files){
+	fs.readdir(path.join(this.stage_dir), function(err, files){
 		if(err) throw err;
 		
 		if(!files.length) throw new Error('No files found within the stage directory: ' + this.stage_dir);
