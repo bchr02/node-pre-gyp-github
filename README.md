@@ -40,10 +40,10 @@ Within GitHub, create a new authorization:
 4. Select "public_repo" and "repo_deployment"
 5. Generate Token
 6. copy the key that's generated and set NODE_PRE_GYP_GITHUB_TOKEN environment variable to it. Within your command prompt:
+7. Optional: If you have proxy set the http_proxy environment variable
 
 ```
-If you have proxy set the http_proxy environment variable
-SET http_proxy=http://<proxy.address><proxy.port>
+SET http_proxy=http://<proxy.address><proxy.port>   (Optional)
 SET NODE_PRE_GYP_GITHUB_TOKEN=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 
