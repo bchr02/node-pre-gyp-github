@@ -25,7 +25,7 @@
     "releases"
   ],
   "dependencies": {
-    "github": "^0.2.4",
+    "github": "^12.1.0",
     "commander": "^2.9.0"
   },
   "devDependencies": {

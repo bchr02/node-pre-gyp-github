@@ -88,12 +88,12 @@ NodePreGypGithub.prototype.createRelease = function(args, callback) {
 	});
 	
 	this.github.authenticate(this.authenticate_settings());
-	this.github.releases.createRelease(options, callback);
+	this.github.repos.createRelease(options, callback);
 };
 
 NodePreGypGithub.prototype.uploadAsset = function(cfg){
 	this.github.authenticate(this.authenticate_settings());
-	this.github.releases.uploadAsset({
+	this.github.repos.uploadAsset({
 		owner: this.owner,
 		id: this.release.id,
 		repo: this.repo,
@@ -108,15 +108,21 @@ NodePreGypGithub.prototype.uploadAsset = function(cfg){
 NodePreGypGithub.prototype.uploadAssets = function(){
 	var asset;
 	consoleLog("Stage directory path: " + path.join(this.stage_dir));
-	fs.readdir(path.join(this.stage_dir), function(err, files){
+	fs.readdir(path.join('D:/HSM/OwnRepository/TestNodeGypGithub/build/stage/0.0.2'), function(err, files){
 		if(err) throw err;
 		
 		if(!files.length) throw new Error('No files found within the stage directory: ' + this.stage_dir);
 		
 		files.forEach(function(file){
-			asset = this.release.assets.filter(function(element, index, array){
-				return element.name === file;
-			});
+			if(this.release.data === undefined) {
+				asset = this.release.assets.filter(function(element, index, array){
+					return element.name === file;
+				});
+			} else {
+				asset = this.release.data.assets.filter(function(element, index, array){
+					return element.name === file;
+				});
+			}
 			if(asset.length) {
 				throw new Error("Staged file " + file + " found but it already exists in release " + this.release.tag_name + ". If you would like to replace it, you must first manually delete it within GitHub.");
 			}
@@ -134,14 +140,19 @@ NodePreGypGithub.prototype.uploadAssets = function(){
 NodePreGypGithub.prototype.publish = function(options) {
 	options = (typeof options === 'undefined') ? {} : options;
 	verbose = (typeof options.verbose === 'undefined' || options.verbose) ? true : false;
+	if (options.proxy) {
+		if (process.env.http_proxy === undefined) {
+			throw new Error('You have to define the http_proxy env!');
+		}
+		this.github.proxy = process.env.http_proxy;
+	}
 	this.init();
 	this.github.authenticate(this.authenticate_settings());
-	this.github.releases.listReleases({
+	this.github.repos.getReleases({
 		'owner': this.owner,
 		'repo': this.repo
 	}, function(err, data){
 		var release;
-		
 		if(err) throw err;
 		
 		// when remote_path is set expect files to be in stage_dir / remote_path after substitution
@@ -155,7 +166,7 @@ NodePreGypGithub.prototype.publish = function(options) {
 		
 		release	= (function(){ // create a new array containing only those who have a matching version.
 			if(data) {
-				data = data.filter(function(element, index, array){
+				data = data.data.filter(function(element, index, array){
 					return element.tag_name === options.tag_name;
 				}.bind(this));
 				return data;
@@ -164,17 +175,16 @@ NodePreGypGithub.prototype.publish = function(options) {
 		}.bind(this))();
 		
 		this.release = release[0];
-		
 		if(!release.length) {
 			this.createRelease(options, function(err, release) {
 				if(err) throw err;
 				
 				this.release = release;
 				if (release.draft) {
-					consoleLog('Release ' + release.tag_name + " not found, so a draft release was created. YOU MUST MANUALLY PUBLISH THIS DRAFT WITHIN GITHUB FOR IT TO BE ACCESSIBLE.");
+					consoleLog('Release ' + release.data.tag_name + " not found, so a draft release was created. YOU MUST MANUALLY PUBLISH THIS DRAFT WITHIN GITHUB FOR IT TO BE ACCESSIBLE.");
 				}
 				else {
-					consoleLog('Release ' + release.tag_name + " not found, so a new release was created and published.");
+					consoleLog('Release ' + release.data.tag_name + " not found, so a new release was created and published.");
 				}
 				this.uploadAssets();
 			}.bind(this));
