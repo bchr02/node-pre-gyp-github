@@ -15,13 +15,13 @@ var reset_mocks = function() {
 	fs.readFileSync = function(){return '{"name":"test","version":"0.0.1","repository": {"url":"git+https://github.com/test/test.git"},"binary":{"host":"https://github.com/test/test/releases/download/","remote_path":"{version}"}}';};
 	index.stage_dir = stage_dir;
 	index.github.authenticate = function(){};
-	index.github.releases.listReleases = function(options, cb){
+	index.github.repos.getReleases = function(options, cb){
 		cb(null, [{"tag_name":"0.0.0","assets":[{"name":"filename"}]}]);
 	};
-	index.github.releases.createRelease = function(options, cb){
+	index.github.repos.createRelease = function(options, cb){
 		cb(null,{"tag_name":"0.0.1","draft":true,"assets":[{}]});
 	};
-	index.github.releases.uploadAsset = function(cfg,cb){cb();};
+	index.github.repos.uploadAsset = function(cfg,cb){cb();};
 };
 
 if(!process.env.COVERALLS_SERVICE_NAME) console.log('To post to coveralls.io, be sure to set COVERALLS_SERVICE_NAME environment variable');
@@ -37,7 +37,7 @@ describe("Publishes packages to GitHub Releases", function() {
 			fs.readdir = function(filename, cb) {
 				cb(null,["filename"]);
 			};
-			index.github.releases.createRelease = function(options, cb){
+			index.github.repos.createRelease = function(options, cb){
 				cb(null,{"tag_name":"0.0.1","draft":false,"assets":[{}]});
 			};
 			expect(function(){ index.publish(options); }).to.not.throw();
@@ -94,7 +94,7 @@ describe("Publishes packages to GitHub Releases", function() {
 		it("should throw an error when github.releases.listReleases returns an error", function() {
 			var options = {'draft': true, 'verbose': false};
 			reset_mocks();
-			index.github.releases.listReleases = function(options, cb){
+			index.github.repos.getReleases = function(options, cb){
 				cb(new Error('listReleases error'));
 			};
 			expect(function(){ index.publish(options); }).to.throw('listReleases error');
@@ -103,10 +103,10 @@ describe("Publishes packages to GitHub Releases", function() {
 		it("should throw an error when github.releases.createRelease returns an error", function() {
 			var options = {'draft': true, 'verbose': false};
 			reset_mocks();
-			index.github.releases.listReleases = function(options, cb){
+			index.github.repos.getReleases = function(options, cb){
 				cb(null,null);
 			};
-			index.github.releases.createRelease = function(options, cb){
+			index.github.repos.createRelease = function(options, cb){
 				cb(new Error('createRelease error'));
 			};
 			expect(function(){ index.publish(options); }).to.throw('createRelease error');
@@ -136,7 +136,7 @@ describe("Publishes packages to GitHub Releases", function() {
 			fs.readdir = function(filename, cb) {
 				cb(null,["filename"]);
 			};
-			index.github.releases.listReleases = function(options, cb){
+			index.github.repos.getReleases = function(options, cb){
 				cb(null, [{"tag_name":"0.0.1","assets":[{"name":"filename"}]}]);
 			};
 			expect(function(){ index.publish(options); }).to.throw(/^Staged file .* found but it already exists in release .*. If you would like to replace it, you must first manually delete it within GitHub./i);
@@ -148,7 +148,7 @@ describe("Publishes packages to GitHub Releases", function() {
 			fs.readdir = function(filename, cb) {
 				cb(null,["filename"]);
 			};
-			index.github.releases.uploadAsset = function(cfg,cb){
+			index.github.repos.uploadAsset = function(cfg,cb){
 				cb(new Error('uploadAsset error')); 
 			};
 			expect(function(){ index.publish(options); }).to.throw("uploadAsset error");
@@ -165,7 +165,7 @@ describe("Publishes packages to GitHub Releases", function() {
 			fs.readdir = function(filename, cb) {
 				cb(null,["filename"]);
 			};
-			index.github.releases.createRelease = function(options, cb){
+			index.github.repos.getReleases = function(options, cb){
 				cb(null,{"tag_name":"0.0.1","draft":false,"assets":[{}]});
 			};
 			expect(function(){ index.publish(options); }).to.not.throw();

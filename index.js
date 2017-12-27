@@ -93,6 +93,9 @@ NodePreGypGithub.prototype.createRelease = function(args, callback) {
 
 NodePreGypGithub.prototype.uploadAsset = function(cfg){
 	this.github.authenticate(this.authenticate_settings());
+	if (this.release.id === undefined && this.release.data === undefined) {
+		this.release['id'] = '0.0.0';
+	}
 	var releaseID = this.release.id === undefined ? this.release.data.id : this.release.id;
 	this.github.repos.uploadAsset({
 		owner: this.owner,
@@ -111,19 +114,13 @@ NodePreGypGithub.prototype.uploadAssets = function(){
 	consoleLog("Stage directory path: " + path.join(this.stage_dir));
 	fs.readdir(path.join(this.stage_dir), function(err, files){
 		if(err) throw err;
-		
 		if(!files.length) throw new Error('No files found within the stage directory: ' + this.stage_dir);
 		
 		files.forEach(function(file){
-			if(this.release.data === undefined) {
-				asset = this.release.assets.filter(function(element, index, array){
-					return element.name === file;
-				});
-			} else {
-				asset = this.release.data.assets.filter(function(element, index, array){
-					return element.name === file;
-				});
-			}
+			var assetsData = this.release.data === undefined ? this.release : this.release.data;
+			asset = assetsData.assets.filter(function(element, index, array){
+				return element.name === file;
+			});
 			if(asset.length) {
 				throw new Error("Staged file " + file + " found but it already exists in release " + this.release.tag_name + ". If you would like to replace it, you must first manually delete it within GitHub.");
 			}
@@ -164,28 +161,29 @@ NodePreGypGithub.prototype.publish = function(options) {
 			// This is here for backwards compatibility for before binary.remote_path support was added in version 1.2.0.
 			options.tag_name = this.package_json.version;
 		}
-		
+
 		release	= (function(){ // create a new array containing only those who have a matching version.
 			if(data) {
-				data = data.data.filter(function(element, index, array){
+				var dataArr = data.data === undefined ? data : data.data;
+				dataArr = Array.isArray(dataArr) === true ? dataArr : [dataArr];
+				data = dataArr.filter(function(element, index, array){
 					return element.tag_name === options.tag_name;
 				}.bind(this));
 				return data;
 			}
 			else return [];
 		}.bind(this))();
-		
 		this.release = release[0];
 		if(!release.length) {
 			this.createRelease(options, function(err, release) {
 				if(err) throw err;
-				
 				this.release = release;
+				var tagName = release.data === undefined ? release.tag_name : release.data.tag_name;
 				if (release.draft) {
-					consoleLog('Release ' + release.data.tag_name + " not found, so a draft release was created. YOU MUST MANUALLY PUBLISH THIS DRAFT WITHIN GITHUB FOR IT TO BE ACCESSIBLE.");
+					consoleLog('Release ' + tagName + " not found, so a draft release was created. YOU MUST MANUALLY PUBLISH THIS DRAFT WITHIN GITHUB FOR IT TO BE ACCESSIBLE.");
 				}
 				else {
-					consoleLog('Release ' + release.data.tag_name + " not found, so a new release was created and published.");
+					consoleLog('Release ' + tagName + " not found, so a new release was created and published.");
 				}
 				this.uploadAssets();
 			}.bind(this));
