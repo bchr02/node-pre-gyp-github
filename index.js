@@ -96,16 +96,16 @@ NodePreGypGithub.prototype.uploadAsset = function(cfg){
 	if (this.release.id === undefined && this.release.data === undefined) {
 		this.release['id'] = '0.0.0';
 	}
-	var releaseID = this.release.id === undefined ? this.release.data.id : this.release.id;
+	var releaseID = this.release.id === undefined ? this.release.data : this.release;
 	this.github.repos.uploadAsset({
 		owner: this.owner,
-		id: releaseID,
+		id: releaseID.id,
 		repo: this.repo,
 		name: cfg.fileName,
 		filePath: cfg.filePath
 	}, function(err){
 		if(err) throw err;
-		consoleLog('Staged file ' + cfg.fileName + ' saved to ' + this.owner + '/' +  this.repo + ' release ' + this.release.tag_name + ' successfully.');
+		consoleLog('Staged file ' + cfg.fileName + ' saved to ' + this.owner + '/' +  this.repo + ' release ' + releaseID.tag_name + ' successfully.');
 	}.bind(this));
 };
 
