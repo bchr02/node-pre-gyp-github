@@ -10,6 +10,7 @@ Instead of ```node-pre-gyp publish``` use **```node-pre-gyp-github publish```**
 ## Options for publish command
 * --silent : Turns verbose messages off.
 * --release : Publish the GitHub Release immediately instead of creating a Draft.
+* --proxy: Set this flag if you are under a proxy
 
   For Ex. ```node-pre-gyp-github publish --release```
 
@@ -39,8 +40,10 @@ Within GitHub, create a new authorization:
 4. Select "public_repo" and "repo_deployment"
 5. Generate Token
 6. copy the key that's generated and set NODE_PRE_GYP_GITHUB_TOKEN environment variable to it. Within your command prompt:
+7. Optional: If you have proxy set the http_proxy environment variable
 
 ```
+SET http_proxy=http://<proxy.address><proxy.port>   (Optional)
 SET NODE_PRE_GYP_GITHUB_TOKEN=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
 
