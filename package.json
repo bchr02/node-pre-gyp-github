@@ -25,8 +25,10 @@
     "releases"
   ],
   "dependencies": {
-    "github": "^0.2.4",
-    "commander": "^2.9.0"
+    "@octokit/rest": "^15.9.5",
+    "commander": "^2.9.0",
+    "mime-types": "^2.1.19",
+    "sinon": "^6.1.4"
   },
   "devDependencies": {
     "chai": "^3.5.0",
