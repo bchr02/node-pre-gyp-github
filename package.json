@@ -1,12 +1,12 @@
 {
   "name": "node-pre-gyp-github",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "A node-pre-gyp module which provides the ability to publish to GitHub releases.",
   "bin": "./bin/node-pre-gyp-github.js",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test",
-    "coverage": "istanbul cover ./node_modules/mocha/bin/_mocha --report text-lcov -- -R spec | node ./node_modules/coveralls/bin/coveralls.js"
+    "test": "nyc --reporter=html --reporter=text mocha",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {
     "type": "git",
@@ -26,15 +26,15 @@
   ],
   "dependencies": {
     "@octokit/rest": "^15.9.5",
-    "commander": "^2.9.0",
+    "commander": "^2.17.0",
     "mime-types": "^2.1.19",
     "sinon": "^6.1.4"
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "coveralls": "^2.11.9",
-    "istanbul": "^0.4.3",
-    "mocha": "^2.5.3"
+    "coveralls": "^3.0.2",
+    "mocha": "^5.2.0",
+    "nyc": "^12.0.2"
   },
   "author": "Bill Christo",
   "license": "MIT",

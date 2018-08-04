@@ -16,12 +16,12 @@ var reset_index = function(index_string_ref) {
 var sandbox = sinon.createSandbox();
 
 var reset_mocks = function() {
-  sandbox.restore();
+	sandbox.restore();
 	process.env.NODE_PRE_GYP_GITHUB_TOKEN = "secret";
 	fs = reset_index('fs');
 	fs.readFileSync = function(){return '{"name":"test","version":"0.0.1","repository": {"url":"git+https://github.com/test/test.git"},"binary":{"host":"https://github.com/test/test/releases/download/","remote_path":"{version}"}}';};
 	index.stage_dir = stage_dir;
-  Index.prototype.octokit = function() {return octokit;};
+	Index.prototype.octokit = function() {return octokit;};
 	sandbox.stub(octokit, 'authenticate');
 	sandbox.stub(octokit.repos, 'getReleases').callsFake(function(options, cb){
 		cb(null, {data: [{"tag_name":"0.0.0","assets":[{"name":"filename"}]}]});
@@ -39,24 +39,40 @@ describe("Publishes packages to GitHub Releases", function() {
 	
 	describe("Publishes without an error under all options", function() {
 		
-		it("should publish a non-draft release without an error", function() {
-			var options = {'draft': false, 'verbose': false};
+		it("should publish without error in all scenarios", function() {
+			var log = console.log;
 			reset_mocks();
 			fs.readdir = function(filename, cb) {
 				cb(null,["filename"]);
 			};
-      fs.statSync = function() {return 0;}
-      index.publish(options)
-			expect(function(){ index.publish(options); }).to.not.throw();
-		});
-		
-		it("should publish a draft release without an error", function() {
-			var options = {'draft': true, 'verbose': false};
-			reset_mocks();
-			fs.readdir = function(filename, cb) {
-				cb(null,["filename"]);
+	    	fs.statSync = function() {return 0;}
+			console.log = function() {};
+
+			// testing scenario when a release already exists
+			expect(function(){ index.publish(); }).to.not.throw();
+			expect(function(){ index.publish({'draft': false, 'verbose': false}); }).to.not.throw();
+			expect(function(){ index.publish({'draft': false, 'verbose': true}); }).to.not.throw();
+			expect(function(){ index.publish({'draft': true, 'verbose': false}); }).to.not.throw();
+			expect(function(){ index.publish({'draft': true, 'verbose': true}); }).to.not.throw();
+			
+			// testing scenario when a release does not already exist
+			octokit.repos.getReleases = function(options, cb){
+				cb(null,{data: []});
 			};
-			expect(function(){ index.publish(options); }).to.not.throw();
+			octokit.repos.createRelease = function(options, cb){
+				cb(null, { data: { draft: false} });
+			};
+			expect(function(){ index.publish(); }).to.not.throw();
+			expect(function(){ index.publish({'draft': false, 'verbose': false}); }).to.not.throw();
+			expect(function(){ index.publish({'draft': false, 'verbose': true}); }).to.not.throw();
+			octokit.repos.createRelease = function(options, cb){
+				cb(null, { data: { draft: true} });
+			};
+			expect(function(){ index.publish({'draft': true, 'verbose': false}); }).to.not.throw();
+			expect(function(){ index.publish({'draft': true, 'verbose': true}); }).to.not.throw();
+			fs.readFileSync = function(){return '{"version":"0.0.1","repository": {"url":"git+https://github.com/test/test.git"},"binary":{"host":"https://github.com/test/test/releases/download/","remote_path":"{version}"}}';};
+			expect(function(){ index.publish(); }).to.not.throw();
+			console.log = log;
 		});
 	
 	});
@@ -103,13 +119,13 @@ describe("Publishes packages to GitHub Releases", function() {
 			reset_mocks();
       
 			octokit.repos.getReleases.restore();
-      sandbox.stub(octokit.repos, 'getReleases').callsFake(function(options, cb){
+      		sandbox.stub(octokit.repos, 'getReleases').callsFake(function(options, cb){
 				cb(new Error('getReleases error'));
 			});
 			expect(function(){ index.publish(options); }).to.throw('getReleases error');
 		});
 		
-		it("should throw an error when github.releases.createRelease returns an error", function() {
+		it("should throw an error when octokit.repos.createRelease returns an error", function() {
 			var options = {'draft': true, 'verbose': false};
 			reset_mocks();
 			octokit.repos.getReleases = function(options, cb){
@@ -174,7 +190,7 @@ describe("Publishes packages to GitHub Releases", function() {
 			fs.readdir = function(filename, cb) {
 				cb(null,["filename"]);
 			};
-      fs.statSync = function() {return 0;}
+      		fs.statSync = function() {return 0;}
 			octokit.reposcreateRelease = function(options, cb){
 				cb(null,{data: {"tag_name":"0.0.1","draft":false,"assets":[{}]}});
 			};
