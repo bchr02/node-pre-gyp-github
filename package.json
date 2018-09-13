@@ -27,14 +27,14 @@
   "dependencies": {
     "@octokit/rest": "^15.9.5",
     "commander": "^2.17.0",
-    "mime-types": "^2.1.19",
-    "sinon": "^6.1.4"
+    "mime-types": "^2.1.19"
   },
   "devDependencies": {
     "chai": "^3.5.0",
     "coveralls": "^3.0.2",
     "mocha": "^5.2.0",
-    "nyc": "^12.0.2"
+    "nyc": "^12.0.2",
+    "sinon": "^6.1.4"
   },
   "author": "Bill Christo",
   "license": "MIT",
