@@ -41,7 +41,7 @@ NodePreGypGithub.prototype.init = function() {
 	}
 
   this.octokit = NodePreGypGithub.prototype.octokit({
-    baseUrl: 'https://' + this.host + '/api',
+    baseUrl: 'https://' + this.host,
     headers: {
       "user-agent": (this.package_json.name) ? this.package_json.name : "node-pre-gyp-github"
     }
