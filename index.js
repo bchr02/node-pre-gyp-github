@@ -24,7 +24,7 @@ NodePreGypGithub.prototype.init = function() {
 	else {
 		ownerRepo = this.package_json.repository.url.match(/https?:\/\/([^\/]+)\/(.*)(?=\.git)/i);
 		if(ownerRepo) {
-      this.host = ownerRepo[1];
+      this.host = 'api.' + ownerRepo[1];
 			ownerRepo = ownerRepo[2].split('/');
 			this.owner = ownerRepo[0];
 			this.repo = ownerRepo[1];
