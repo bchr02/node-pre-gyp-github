@@ -24,7 +24,7 @@ NodePreGypGithub.prototype.init = function() {
 	else {
 		ownerRepo = this.package_json.repository.url.match(/https?:\/\/([^\/]+)\/(.*)(?=\.git)/i);
 		if(ownerRepo) {
-      this.host = ownerRepo[1];
+      this.host = 'api.' + ownerRepo[1];
 			ownerRepo = ownerRepo[2].split('/');
 			this.owner = ownerRepo[0];
 			this.repo = ownerRepo[1];
@@ -41,7 +41,7 @@ NodePreGypGithub.prototype.init = function() {
 	}
 
   this.octokit = NodePreGypGithub.prototype.octokit({
-    baseUrl: 'https://' + this.host + '/api/v3',
+    baseUrl: 'https://' + this.host,
     headers: {
       "user-agent": (this.package_json.name) ? this.package_json.name : "node-pre-gyp-github"
     }
