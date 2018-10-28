@@ -15,9 +15,9 @@ NodePreGypGithub.prototype.octokit = require("@octokit/rest");
 NodePreGypGithub.prototype.stage_dir = path.join(cwd,"build","stage");
 NodePreGypGithub.prototype.init = function() {
 	var ownerRepo, hostPrefix;
-	
+
 	this.package_json = JSON.parse(fs.readFileSync(path.join(cwd,'package.json')));
-	
+
 	if(!this.package_json.repository || !this.package_json.repository.url){
 		throw new Error('Missing repository.url in package.json');
 	}
@@ -31,7 +31,7 @@ NodePreGypGithub.prototype.init = function() {
 		}
 		else throw new Error('A correctly formatted GitHub repository.url was not found within package.json');
 	}
-	
+
 	hostPrefix = 'https://' + this.host + '/' + this.owner + '/' + this.repo + '/releases/download/';
 	if(!this.package_json.binary || 'object' !== typeof this.package_json.binary || 'string' !== typeof this.package_json.binary.host){
 		throw new Error('Missing binary.host in package.json');
@@ -69,7 +69,7 @@ NodePreGypGithub.prototype.createRelease = function(args, callback) {
 		'draft': true,
 		'prerelease': false
 	};
-	
+
 	Object.keys(args).forEach(function(key) {
 		if(args.hasOwnProperty(key) && options.hasOwnProperty(key)) {
 			options[key] = args[key];
@@ -87,9 +87,9 @@ NodePreGypGithub.prototype.uploadAsset = function(cfg){
 		id: this.release.id,
 		repo: this.repo,
 		name: cfg.fileName,
-		file: cfg.filePath,
-    contentType: mime.contentType(cfg.fileName) || 'application/octet-stream',
-    contentLength: fs.statSync(cfg.filePath).size,
+		file: fs.createReadStream(cfg.filePath),
+		contentType: mime.contentType(cfg.fileName) || 'application/octet-stream',
+		contentLength: fs.statSync(cfg.filePath).size,
 	}, function(err){
 		if(err) throw err;
 		consoleLog('Staged file ' + cfg.fileName + ' saved to ' + this.owner + '/' +  this.repo + ' release ' + this.release.tag_name + ' successfully.');
@@ -101,9 +101,9 @@ NodePreGypGithub.prototype.uploadAssets = function(){
 	consoleLog("Stage directory path: " + path.join(this.stage_dir));
 	fs.readdir(path.join(this.stage_dir), function(err, files){
 		if(err) throw err;
-		
+
 		if(!files.length) throw new Error('No files found within the stage directory: ' + this.stage_dir);
-		
+
 		files.forEach(function(file){
       if(this.release && this.release.assets) {
 			  asset = this.release.assets.filter(function(element, index, array){
@@ -133,7 +133,7 @@ NodePreGypGithub.prototype.publish = function(options) {
 	}, function(err, data){
 		var release;
 		if(err) throw err;
-		
+
 		// when remote_path is set expect files to be in stage_dir / remote_path after substitution
 		if (this.package_json.binary.remote_path) {
 			options.tag_name = this.package_json.binary.remote_path.replace(/\{version\}/g, this.package_json.version);
