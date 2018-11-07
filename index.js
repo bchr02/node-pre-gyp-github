@@ -36,7 +36,7 @@ NodePreGypGithub.prototype.init = function() {
 	if(!this.package_json.binary || 'object' !== typeof this.package_json.binary || 'string' !== typeof this.package_json.binary.host){
 		throw new Error('Missing binary.host in package.json');
 	}
-	else if (this.package_json.binary.host.substr(0, hostPrefix.length) !== hostPrefix){
+	else if (this.package_json.binary.host.replace('https://','https://api.').substr(0, hostPrefix.length) !== hostPrefix){
 		throw new Error('binary.host in package.json should begin with: "' + hostPrefix + '"');
 	}
 
