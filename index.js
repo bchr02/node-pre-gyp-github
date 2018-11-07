@@ -87,9 +87,9 @@ NodePreGypGithub.prototype.uploadAsset = function(cfg){
 		id: this.release.id,
 		repo: this.repo,
 		name: cfg.fileName,
-		file: cfg.filePath,
-    contentType: mime.contentType(cfg.fileName) || 'application/octet-stream',
-    contentLength: fs.statSync(cfg.filePath).size,
+		file: fs.createReadStream(cfg.filePath),
+        contentType: mime.contentType(cfg.fileName) || 'application/octet-stream',
+        contentLength: fs.statSync(cfg.filePath).size
 	}, function(err){
 		if(err) throw err;
 		consoleLog('Staged file ' + cfg.fileName + ' saved to ' + this.owner + '/' +  this.repo + ' release ' + this.release.tag_name + ' successfully.');
