@@ -14,14 +14,14 @@ Instead of ```node-pre-gyp publish``` use **```node-pre-gyp-github publish```**
   For Ex. ```node-pre-gyp-github publish --release```
 
 ## Install
-```javascript
+```bash
 npm install -g node-pre-gyp-github
 ```
 
 ## Configuration
 This module is intended to be used with node-pre-gyp. Therefore, be sure to configure and install node-pre-gyp first. After having done that, within **```package.json```** update the ```binary``` properties ```host``` and ```remote_path``` so it matches the following format:
 
-```
+```json
   "host": "https://github.com/[owner]/[repo]/releases/download/",
   "remote_path": "{version}"
 ```
