@@ -17,7 +17,7 @@ const getReleaseByTag = async (octokit: Octokit, {owner, repo, tag}: {owner: str
 
 		return data;
 	} catch (error) {
-		if (error?.name! === 'HttpError' && error?.status! === 404) {
+		if (error?.name === 'HttpError' && error?.status === 404) {
 			return;
 		}
 
