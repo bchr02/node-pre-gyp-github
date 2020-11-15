@@ -3,7 +3,7 @@ import {promises as fs} from 'fs';
 import mime from 'mime-types';
 import pMap from 'p-map';
 import pupa from 'pupa';
-import readPkg from 'read-pkg';
+import readPkgUp from 'read-pkg-up';
 import parseGithubUrl from 'parse-github-url';
 import {Octokit} from '@octokit/rest';
 
@@ -70,7 +70,7 @@ export = async (options: {
 		...options
 	};
 
-	const packageJson = await readPkg();
+	const packageJson = await readPkgUp();
 
 	if (!packageJson?.repository?.url) {
 		throw new Error('Missing repository url in package.json');
