@@ -2,10 +2,14 @@
   "name": "node-pre-gyp-github",
   "version": "1.4.3",
   "description": "A node-pre-gyp module which provides the ability to publish to GitHub releases.",
-  "bin": "./bin/node-pre-gyp-github.js",
-  "main": "index.js",
+  "bin": "dist/cli.js",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "test": "nyc --reporter=html --reporter=text mocha",
+    "build": "tsc",
+    "test": "xo && nyc --reporter=html --reporter=text mocha",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {
@@ -25,21 +29,34 @@
     "releases"
   ],
   "dependencies": {
-    "@octokit/rest": "^15.9.5",
-    "commander": "^2.17.0",
-    "mime-types": "^2.1.19"
+    "@octokit/rest": "^18.0.6",
+    "meow": "^7.1.1",
+    "mime-types": "^2.1.27",
+    "p-map": "^4.0.0",
+    "parse-github-url": "^1.0.2",
+    "pupa": "^2.1.1",
+    "read-pkg-up": "^7.0.1",
+    "update-notifier": "^5.0.0"
   },
   "devDependencies": {
+    "@richienb/tsconfig": "^0.1.1",
     "chai": "^3.5.0",
     "coveralls": "^3.0.2",
     "mocha": "^5.2.0",
     "nyc": "^12.0.2",
-    "sinon": "^6.1.4"
+    "sinon": "^6.1.4",
+    "typescript": "^4.0.5",
+    "xo": "^0.34.1"
   },
   "author": "Bill Christo",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/bchr02/node-pre-gyp-github/issues"
   },
-  "homepage": "https://github.com/bchr02/node-pre-gyp-github#readme"
+  "homepage": "https://github.com/bchr02/node-pre-gyp-github#readme",
+  "xo": {
+    "rules": {
+      "@typescript-eslint/no-implicit-any-catch": "off"
+    }
+  }
 }
