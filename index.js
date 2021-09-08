@@ -40,21 +40,16 @@ NodePreGypGithub.prototype.init = function() {
     throw new Error(`binary.host in package.json should begin with: "${  hostPrefix  }"`);
   }
 
+  let token = process.env.NODE_PRE_GYP_GITHUB_TOKEN;
+  if(!token) throw new Error(`NODE_PRE_GYP_GITHUB_TOKEN environment variable not found`);
+	
   this.octokit = NodePreGypGithub.prototype.octokit({
     baseUrl: `https://${  this.host}`,
     headers: {
       "user-agent": (this.package_json.name) ? this.package_json.name : `node-pre-gyp-github`,
+      "Authorization": "token " + token,
     },
   });
-};
-
-NodePreGypGithub.prototype.authenticate_settings = function(){
-  let token = process.env.NODE_PRE_GYP_GITHUB_TOKEN;
-  if(!token) throw new Error(`NODE_PRE_GYP_GITHUB_TOKEN environment variable not found`);
-  return {
-    "type": `oauth`,
-    "token": token,
-  };
 };
 
 NodePreGypGithub.prototype.createRelease = function(args, callback) {
@@ -75,12 +70,10 @@ NodePreGypGithub.prototype.createRelease = function(args, callback) {
       options[key] = args[key];
     }
   });
-  this.octokit.authenticate(this.authenticate_settings());
   this.octokit.repos.createRelease(options, callback);
 };
 
 NodePreGypGithub.prototype.uploadAsset = function(cfg){
-  this.octokit.authenticate(this.authenticate_settings());
   this.octokit.repos.uploadAsset({
     url: this.release.upload_url,
     owner: this.owner,
@@ -126,7 +119,6 @@ NodePreGypGithub.prototype.publish = function(options) {
   options = (typeof options === `undefined`) ? {} : options;
   verbose = (typeof options.verbose === `undefined` || options.verbose) ? true : false;
   this.init();
-  this.octokit.authenticate(this.authenticate_settings());
   this.octokit.repos.getReleases({
     'owner': this.owner,
     'repo': this.repo,
