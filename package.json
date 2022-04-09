@@ -13,6 +13,10 @@
     "type": "git",
     "url": "git+https://github.com/bchr02/node-pre-gyp-github.git"
   },
+  "files": [
+    "bin",
+    "index.js"
+  ],
   "keywords": [
     "node-pre-gyp",
     "binary",
