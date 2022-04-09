@@ -4,7 +4,7 @@ var module = require('../index.js');
 var program = require('commander');
 
 program
-	.command('publish [options]')
+	.command('publish')
 	.description('publishes the contents of .\\build\\stage\\{version} to the current version\'s GitHub release')
 	.option("-r, --release", "publish immediately, do not create draft")
 	.option("-s, --silent", "turns verbose messages off")
