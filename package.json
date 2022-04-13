@@ -1,6 +1,6 @@
 {
   "name": "node-pre-gyp-github",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "A node-pre-gyp module which provides the ability to publish to GitHub releases.",
   "bin": "./bin/node-pre-gyp-github.js",
   "main": "index.js",
