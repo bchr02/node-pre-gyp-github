@@ -9,7 +9,7 @@ program
     .description('publishes the contents of .\\build\\stage\\{version} to the current version\'s GitHub release')
     .option("-r, --release", "publish immediately, do not create draft")
     .option("-s, --silent", "turns verbose messages off")
-    .action(async function(cmd, options){
+    .action(async function(options){
         const opts = {
             draft: options.release ? false : true,
             verbose: options.silent ? false : true
