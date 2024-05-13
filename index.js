@@ -52,11 +52,9 @@ module.exports = class NodePreGypGithub {
 
     createOctokitInstance(token) {
         return new Octokit({
-            baseUrl: 'https://' + this.host,
-            auth: token,
-            headers: {
-                "user-agent": (this.package_json.name) ? this.package_json.name : "node-pre-gyp-github"
-            }
+          baseUrl: "https://" + this.host,
+          auth: token,
+          userAgent: this.package_json.name ? this.package_json.name : "node-pre-gyp-github",
         });
     }
 
